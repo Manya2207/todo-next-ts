@@ -1,20 +1,21 @@
 import { observer } from "mobx-react-lite";
 import TaskStore from "../stores/TaskStore";
+import { types } from "mobx-state-tree";
 
-interface Task {
-  id: string;
-  title: string;
-  description: string;
-  status: string;
-}
+const Task = types.model("Task", {
+  id: types.identifier,
+  title: types.string,
+  description: types.string,
+  status: types.string,
+});
 
 interface TaskListProps {
-  taskStore: InstanceType<typeof TaskStore>; // Use 'InstanceType<typeof TaskStore>' to refer to the type of TaskStore
+  taskStore: typeof TaskStore.Type;
 }
 
 const TaskList = observer(({ taskStore }: TaskListProps) => {
   const statuses = ["To Do", "In Progress", "Completed"];
-  const colors = ["bg-yellow-300", "bg-blue-500", "bg-green-300"];
+  const colors = ["bg-yellow-300", "bg-blue-300", "bg-green-300"];
 
   const handleChangeStatus = (taskId: string, newStatus: string) => {
     taskStore.updateTaskStatus(taskId, newStatus);
@@ -29,7 +30,7 @@ const TaskList = observer(({ taskStore }: TaskListProps) => {
           >
             {status}
           </h2>
-          {taskStore.tasks.map((task: Task) => {
+          {taskStore.tasks.map((task: typeof Task.Type) => {
             if (task.status === status) {
               return (
                 <div
@@ -50,7 +51,7 @@ const TaskList = observer(({ taskStore }: TaskListProps) => {
                   </p>
                   <div className="flex justify-between">
                     <button
-                      className="text-red-500 font-medium hover:text-red-600 focus:outline-none "
+                      className="text-red-500 font-medium hover:text-red-600 focus:outline-none"
                       onClick={() => taskStore.deleteTask(task.id)}
                     >
                       Delete
